@@ -45,59 +45,37 @@ def explain_topic(topic: str, complexity_level: str = "intermediate") -> Dict[st
     """
     Provides explanations of topics at different complexity levels
 
+    Note: This function returns a structured request for the LLM to generate
+    the explanation. The actual content generation happens through the agent.
+
     Args:
         topic: The topic to explain
         complexity_level: beginner, intermediate, or advanced
 
     Returns:
-        Structured explanation of the topic
+        Structured guidance for explanation generation
     """
-    if "quantum entanglement" in topic.lower():
-        explanations = {
-            "beginner": {
-                "definition": "Quantum entanglement is when two tiny particles become magically connected, so when something happens to one particle, the other particle instantly knows about it, no matter how far apart they are!",
-                "key_points": [
-                    "Two particles become mysteriously linked",
-                    "When one changes, the other changes instantly",
-                    "Works even if they're very far apart",
-                    "Scientists use this for special computers and secure messages"
-                ],
-                "example": "Imagine you have two magical coins that are connected. When you flip one coin and it lands on heads, the other coin will always land on tails, even if it's on the other side of the world!"
-            },
-            "intermediate": {
-                "definition": "Quantum entanglement occurs when pairs or groups of particles interact in ways such that the quantum state of each particle cannot be described independently, even when separated by large distances.",
-                "key_points": [
-                    "Particles become correlated in their quantum states",
-                    "Measurement of one particle instantly affects the other",
-                    "The phenomenon appears to violate classical physics",
-                    "Einstein called it 'spooky action at a distance'",
-                    "Applications in quantum computing and cryptography"
-                ],
-                "example": "When two photons are entangled, measuring the polarization of one photon (vertical or horizontal) immediately determines the polarization of its partner, regardless of the distance between them."
-            },
-            "advanced": {
-                "definition": "Quantum entanglement is a quantum mechanical phenomenon where quantum states of two or more objects have to be described with reference to each other, even when separated by large distances, violating Bell's inequalities and classical local realism.",
-                "key_points": [
-                    "Non-local correlations between quantum systems",
-                    "Violation of Bell's inequalities demonstrates quantum non-locality",
-                    "Entangled states cannot be factorized into independent components",
-                    "Fundamental resource for quantum information protocols",
-                    "Decoherence and entanglement dynamics in open systems"
-                ],
-                "example": "In the EPR paradox, measuring the spin component of an entangled electron along any axis instantaneously determines the corresponding measurement outcome for its entangled partner, with correlations that exceed classical bounds as quantified by the CHSH inequality."
-            }
-        }
-        return explanations.get(complexity_level, explanations["intermediate"])
-    else:
-        return {
-            "definition": f"This is a {complexity_level}-level explanation of {topic}",
-            "key_points": [f"Key concept 1 about {topic}", f"Key concept 2 about {topic}"],
-            "example": f"Here's an example related to {topic}"
-        }
+    return {
+        "topic": topic,
+        "complexity_level": complexity_level,
+        "structure_needed": {
+            "definition": f"Provide a clear, {complexity_level}-level definition of {topic}",
+            "key_points": f"List 3-5 key points about {topic} appropriate for {complexity_level} level",
+            "example": f"Give a concrete, relatable example that illustrates {topic} at {complexity_level} level"
+        },
+        "guidelines": {
+            "beginner": "Use simple language, avoid jargon, make it fun and engaging",
+            "intermediate": "Use some technical terms but explain them, balance accessibility with accuracy",
+            "advanced": "Use precise technical terminology, include nuances and complexities"
+        }.get(complexity_level, "Balance clarity with accuracy")
+    }
 
-def create_analogies(topic: str, age_group: str = "10-year-old", concept_focus: str = "connection") -> Dict[str, List[str]]:
+def create_analogies(topic: str, age_group: str = "10-year-old", concept_focus: str = "connection") -> Dict[str, Any]:
     """
     Creates age-appropriate analogies for complex topics
+
+    Note: This function provides guidance for the LLM to generate
+    creative, age-appropriate analogies dynamically.
 
     Args:
         topic: The topic needing analogies
@@ -105,36 +83,112 @@ def create_analogies(topic: str, age_group: str = "10-year-old", concept_focus: 
         concept_focus: The main concept to focus on
 
     Returns:
-        Dictionary with different types of analogies
+        Structured request for analogy generation
     """
-    if "quantum entanglement" in topic.lower():
-        if "10" in age_group or "kid" in age_group or "child" in age_group:
-            return {
-                "magical_twins": [
-                    "Imagine twin siblings who are so connected that when one feels happy, the other instantly feels sad, no matter if one is at home and the other is on vacation across the world.",
-                    "It's like they have a secret magical connection that works faster than anything!"
-                ],
-                "magical_coins": [
-                    "Picture two special coins that are magically linked. Whenever you flip one coin and it shows heads, the other coin (even if it's in another country) will always show tails at the exact same moment.",
-                    "No one knows how the coins 'talk' to each other, but they always do the opposite of each other instantly!"
-                ]
-            }
-        else:
-            return {
-                "business_partners": [
-                    "Think of two business partners whose fates are so intertwined that when one makes a decision, it instantly and automatically determines what the other partner will decide, regardless of distance or communication.",
-                    "They share a connection that transcends normal cause-and-effect relationships."
-                ]
-            }
-    else:
-        return {
-            "everyday_analogy": [f"Think of {topic} like something you use every day..."],
-            "nature_analogy": [f"In nature, {topic} is similar to..."]
+    is_young_audience = any(indicator in age_group.lower() for indicator in ["10", "kid", "child", "young", "elementary"])
+
+    return {
+        "topic": topic,
+        "age_group": age_group,
+        "concept_focus": concept_focus,
+        "analogy_requirements": {
+            "count": 2,
+            "types": ["everyday_object", "relatable_situation"],
+            "style": "magical and fun" if is_young_audience else "relatable and clear",
+            "complexity": "very simple" if is_young_audience else "moderately sophisticated"
+        },
+        "guidelines": f"Create 2-3 creative analogies that explain {topic} (specifically focusing on {concept_focus}) for {age_group}. Use things they encounter in daily life. Make it memorable and engaging."
+    }
+
+def suggest_real_world_applications(topic: str, age_group: str = "general", interest_area: str = "general") -> Dict[str, Any]:
+    """
+    Suggests real-world applications and practical uses of concepts being learned
+
+    Note: This function provides structured guidance for the LLM to generate
+    relevant, motivating real-world connections for any topic.
+
+    Args:
+        topic: The topic to find applications for
+        age_group: Target audience age (helps determine appropriate career/application complexity)
+        interest_area: Student's interests if known (e.g., "gaming", "sports", "art", "science")
+
+    Returns:
+        Structured guidance for generating real-world application examples
+    """
+    is_young_audience = any(indicator in age_group.lower() for indicator in ["10", "kid", "child", "young", "elementary"])
+
+    application_categories = {
+        "career_applications": {
+            "description": "Jobs and careers that use this concept daily",
+            "count": 3,
+            "style": "aspirational and exciting" if is_young_audience else "realistic and diverse",
+            "include": ["job title", "how they use it", "why it matters in that field"]
+        },
+        "everyday_uses": {
+            "description": "How ordinary people use this in daily life",
+            "count": 3,
+            "style": "relatable and concrete",
+            "include": ["common situation", "how the concept applies", "benefit of understanding it"]
+        },
+        "technology_connections": {
+            "description": "Modern technology or apps that rely on this concept",
+            "count": 2,
+            "style": "current and relevant",
+            "include": ["specific technology/app", "how the concept enables it", "impact on users"]
+        },
+        "surprising_applications": {
+            "description": "Unexpected or cool ways this concept is used",
+            "count": 1,
+            "style": "intriguing and memorable",
+            "include": ["unexpected application", "why it's surprising", "the 'wow' factor"]
         }
+    }
+
+    # Adjust complexity based on age
+    if is_young_audience:
+        application_categories["career_applications"]["count"] = 2
+        application_categories["career_applications"]["focus"] = "fun and accessible careers"
+        application_categories["technology_connections"]["focus"] = "games, apps, and gadgets kids know"
+
+    guidelines = f"""Generate real-world applications for {topic} that answer 'When will I use this?'
+
+Target audience: {age_group}
+Interest area: {interest_area}
+
+For each category, provide specific, concrete examples that:
+1. Are genuinely relevant to the concept
+2. Feel current and relatable (not outdated examples)
+3. Show the IMPORTANCE of understanding this concept
+4. Connect to {interest_area} when possible
+5. Build motivation by showing impact and relevance
+
+Make these applications:
+- Specific (name real jobs, technologies, situations)
+- Diverse (show breadth of applications)
+- Inspiring (show why this matters)
+- Connected to student's world and interests where possible
+"""
+
+    return {
+        "topic": topic,
+        "age_group": age_group,
+        "interest_area": interest_area,
+        "application_categories": application_categories,
+        "guidelines": guidelines,
+        "motivational_framing": {
+            "opening": f"Here's why understanding {topic} is actually super useful...",
+            "closing": f"As you can see, {topic} isn't just academic - it's all around us and opens doors to exciting possibilities!",
+            "tone": "enthusiastic and eye-opening"
+        },
+        "personalization_note": f"If student mentioned interest in {interest_area}, prioritize examples from that domain"
+    }
 
 def generate_quiz_questions(topic: str, difficulty: str = "beginner", num_questions: int = 2) -> Dict[str, Any]:
     """
     Generates assessment questions for understanding check
+
+    Note: This function provides specifications for the LLM to generate
+    appropriate quiz questions dynamically for any topic.
 
     Args:
         topic: Topic to create questions for
@@ -142,68 +196,38 @@ def generate_quiz_questions(topic: str, difficulty: str = "beginner", num_questi
         num_questions: Number of questions to generate
 
     Returns:
-        Dictionary with questions and correct answers
+        Structured request for quiz question generation
     """
-    if "quantum entanglement" in topic.lower():
-        question_banks = {
-            "beginner": [
-                {
-                    "question": "What happens when two particles are quantum entangled?",
-                    "options": [
-                        "A) They become connected and instantly affect each other",
-                        "B) They disappear completely", 
-                        "C) They become the same particle",
-                        "D) They start spinning really fast"
-                    ],
-                    "correct": "A",
-                    "explanation": "When particles are entangled, they form a special connection where measuring one instantly affects the other, no matter the distance!"
-                },
-                {
-                    "question": "If you have two entangled 'magical coins' and one shows heads, what will the other show?",
-                    "options": [
-                        "A) Also heads",
-                        "B) Tails",
-                        "C) Sometimes heads, sometimes tails",
-                        "D) It disappears"
-                    ],
-                    "correct": "B",
-                    "explanation": "In our analogy, entangled particles always show opposite results - if one is heads, the other is always tails!"
-                }
-            ],
-            "intermediate": [
-                {
-                    "question": "What did Einstein call quantum entanglement?",
-                    "options": [
-                        "A) Particle magic",
-                        "B) Spooky action at a distance", 
-                        "C) Quantum confusion",
-                        "D) Fast communication"
-                    ],
-                    "correct": "B",
-                    "explanation": "Einstein famously called it 'spooky action at a distance' because he was uncomfortable with the instantaneous connection."
-                }
-            ]
+    question_specs = {
+        "beginner": {
+            "style": "multiple choice with 4 options",
+            "focus": "basic comprehension and key concepts",
+            "language": "simple and clear",
+            "include_explanation": True
+        },
+        "intermediate": {
+            "style": "mix of multiple choice and short answer",
+            "focus": "understanding relationships and applications",
+            "language": "moderately technical",
+            "include_explanation": True
+        },
+        "advanced": {
+            "style": "analytical and scenario-based",
+            "focus": "deep understanding, edge cases, and implications",
+            "language": "technical and precise",
+            "include_explanation": True
         }
+    }
 
-        questions = question_banks.get(difficulty, question_banks["beginner"])
-        selected_questions = questions[:min(num_questions, len(questions))]
+    specs = question_specs.get(difficulty, question_specs["beginner"])
 
-        return {
-            "difficulty": difficulty,
-            "questions": selected_questions,
-            "total_questions": len(selected_questions)
-        }
-    else:
-        return {
-            "topic": topic,
-            "questions": [
-                {
-                    "question": f"Can you explain the main idea of {topic} in your own words?",
-                    "type": "open_ended",
-                    "focus": "comprehension"
-                }
-            ]
-        }
+    return {
+        "topic": topic,
+        "difficulty": difficulty,
+        "num_questions": num_questions,
+        "question_specifications": specs,
+        "guidelines": f"Create {num_questions} {difficulty}-level questions about {topic}. Each question should have clear correct answers and helpful explanations. Questions should check genuine understanding, not just memorization."
+    }
 
 def analyze_student_response(user_answer: str, correct_answer: str, question_type: str = "multiple_choice") -> Dict[str, Any]:
     """
@@ -242,29 +266,21 @@ def analyze_student_response(user_answer: str, correct_answer: str, question_typ
                 "recommendations": ["Try a different analogy", "Simplify the explanation", "Use more visual examples"]
             })
     elif question_type == "open_ended":
-        # Simple heuristic analysis for open-ended responses
-        key_concepts = ["entangled", "connected", "instant", "particles", "measurement"]
-        concepts_mentioned = sum(1 for concept in key_concepts if concept.lower() in user_answer.lower())
-
-        if concepts_mentioned >= 3:
-            analysis.update({
-                "understanding_level": "good", 
-                "encouragement": "Great explanation! You've grasped the key concepts.",
-                "recommendations": ["Move to more advanced topics", "Explore applications"]
-            })
-        elif concepts_mentioned >= 1:
-            analysis.update({
-                "understanding_level": "partial",
-                "encouragement": "You're on the right track! Let's strengthen your understanding.",
-                "recommendations": ["Review key concepts", "Try more analogies", "Practice with examples"]
-            })
-        else:
-            analysis.update({
-                "understanding_level": "needs_improvement",
-                "specific_issues": ["Missing key concepts"],
-                "encouragement": "Let's approach this differently to help you understand better.",
-                "recommendations": ["Start with simpler analogies", "Break down into smaller parts", "Use more concrete examples"]
-            })
+        # For open-ended responses, provide the answer to the LLM for semantic analysis
+        # The LLM will determine if key concepts are present and understanding level
+        analysis.update({
+            "requires_llm_evaluation": True,
+            "student_answer": user_answer,
+            "expected_answer": correct_answer,
+            "evaluation_criteria": [
+                "Does the answer demonstrate understanding of core concepts?",
+                "Are key ideas expressed in the student's own words?",
+                "Is the explanation logical and coherent?",
+                "What specific concepts are missing or incorrect?"
+            ],
+            "encouragement": "Let me evaluate your answer...",
+            "note": "LLM should analyze this response semantically and provide detailed feedback"
+        })
 
     return analysis
 
@@ -339,6 +355,389 @@ def determine_next_learning_action(analysis_results: List[Dict[str, Any]], sessi
             }
         }
 
+
+def teach_concept(
+    concept: str,
+    age_group: str = "general",
+    current_understanding: str = "beginner",
+    interests: str = "general",
+    teaching_strategy: str = "adaptive"
+) -> Dict[str, Any]:
+    """
+    High-level orchestrator that creates a complete, structured teaching plan for any concept.
+    Analyzes the concept type, breaks it into teachable components, and recommends the optimal
+    teaching sequence using available tools.
+
+    Args:
+        concept: The concept to teach (can be simple or complex)
+        age_group: Target audience age (e.g., "10-year-old", "high school", "adult", "general")
+        current_understanding: Student's current level - "beginner", "intermediate", or "advanced"
+        interests: Student's interests for contextualization (e.g., "gaming", "sports", "art", "science", "general")
+        teaching_strategy: Teaching approach - "adaptive" (default), "socratic", 
+                          "worked_examples", "discovery", "direct_instruction"
+
+    Returns:
+        Comprehensive teaching plan with sequenced activities and guidance
+    """
+    # Build student context from parameters
+    student_context = {
+        "age_group": age_group,
+        "prior_knowledge": "unknown",
+        "learning_style_preference": "mixed",
+        "interests": interests,
+        "current_understanding": current_understanding
+    }
+
+    # ========================================================================
+    # STEP 1: Classify the concept type
+    # ========================================================================
+    concept_classification = {
+        "concept": concept,
+        "primary_type": None,
+        "characteristics": [],
+        "complexity_indicators": []
+    }
+
+    # Analyze concept characteristics
+    concept_lower = concept.lower()
+
+    # Type classification
+    if any(word in concept_lower for word in ["how to", "process", "method", "procedure", "steps"]):
+        concept_classification["primary_type"] = "procedural"
+        concept_classification["characteristics"].append("step-by-step learning needed")
+    elif any(word in concept_lower for word in ["what is", "theory", "principle", "concept of", "idea"]):
+        concept_classification["primary_type"] = "abstract"
+        concept_classification["characteristics"].append("needs concrete analogies")
+    elif any(word in concept_lower for word in ["why", "relationship", "connection", "affects", "causes"]):
+        concept_classification["primary_type"] = "relational"
+        concept_classification["characteristics"].append("needs causal reasoning")
+    elif any(word in concept_lower for word in ["system", "structure", "organization", "architecture"]):
+        concept_classification["primary_type"] = "system"
+        concept_classification["characteristics"].append("needs holistic and component views")
+    else:
+        concept_classification["primary_type"] = "factual"
+        concept_classification["characteristics"].append("needs context and application")
+
+    # Complexity assessment
+    word_count = len(concept.split())
+    if word_count > 10 or "and" in concept_lower:
+        concept_classification["complexity_indicators"].append("multi-part concept")
+    if any(technical in concept_lower for technical in ["quantum", "neural", "algorithm", "molecular", "derivative"]):
+        concept_classification["complexity_indicators"].append("technical domain")
+
+    # ========================================================================
+    # STEP 2: Decompose complex concepts
+    # ========================================================================
+    is_complex = len(concept_classification["complexity_indicators"]) > 0
+
+    if is_complex:
+        decomposition = {
+            "is_decomposed": True,
+            "teaching_sequence": [],
+            "guidance": f"This is a complex concept. Break it into digestible chunks.",
+            "approach": "Build understanding progressively, mastering each component before moving to the next"
+        }
+
+        # Provide guidance for decomposition (LLM will generate actual sub-concepts)
+        if concept_classification["primary_type"] == "procedural":
+            decomposition["teaching_sequence"] = [
+                {"phase": "foundation", "focus": "Prerequisites and basic components"},
+                {"phase": "procedure", "focus": "Step-by-step process"},
+                {"phase": "practice", "focus": "Guided application"},
+                {"phase": "mastery", "focus": "Independent execution"}
+            ]
+        elif concept_classification["primary_type"] == "abstract":
+            decomposition["teaching_sequence"] = [
+                {"phase": "concrete", "focus": "Start with tangible examples"},
+                {"phase": "pattern", "focus": "Identify common patterns"},
+                {"phase": "abstraction", "focus": "Generalize the concept"},
+                {"phase": "application", "focus": "Apply to new contexts"}
+            ]
+        elif concept_classification["primary_type"] == "system":
+            decomposition["teaching_sequence"] = [
+                {"phase": "overview", "focus": "Big picture and purpose"},
+                {"phase": "components", "focus": "Individual parts"},
+                {"phase": "interactions", "focus": "How parts work together"},
+                {"phase": "integration", "focus": "Complete system behavior"}
+            ]
+        else:
+            decomposition["teaching_sequence"] = [
+                {"phase": "introduction", "focus": "Core idea"},
+                {"phase": "development", "focus": "Details and nuances"},
+                {"phase": "application", "focus": "Practical use"}
+            ]
+    else:
+        decomposition = {
+            "is_decomposed": False,
+            "teaching_sequence": [{"phase": "complete", "focus": "Teach as unified concept"}],
+            "guidance": "Concept is manageable as a single unit"
+        }
+
+    # ========================================================================
+    # STEP 3: Select teaching strategy and create activity sequence
+    # ========================================================================
+
+    strategy_definitions = {
+        "adaptive": {
+            "description": "Flexible approach that adjusts based on student responses",
+            "best_for": "Unknown student background or mixed ability",
+            "activities": ["explain", "check_understanding", "adapt", "reinforce"]
+        },
+        "socratic": {
+            "description": "Guide student to discover concepts through questioning",
+            "best_for": "Encouraging critical thinking and self-discovery",
+            "activities": ["pose_questions", "guide_reasoning", "confirm_insights", "extend"]
+        },
+        "worked_examples": {
+            "description": "Demonstrate with examples, then have student practice",
+            "best_for": "Procedural concepts and problem-solving",
+            "activities": ["demonstrate", "explain_reasoning", "guided_practice", "independent_practice"]
+        },
+        "discovery": {
+            "description": "Let student explore and discover patterns",
+            "best_for": "Abstract concepts and pattern recognition",
+            "activities": ["present_scenario", "encourage_exploration", "guide_discovery", "formalize"]
+        },
+        "direct_instruction": {
+            "description": "Clear, structured explanation followed by practice",
+            "best_for": "Factual information and clear-cut concepts",
+            "activities": ["explain_clearly", "provide_examples", "check_understanding", "practice"]
+        }
+    }
+
+    selected_strategy = strategy_definitions.get(teaching_strategy, strategy_definitions["adaptive"])
+
+    # Adjust strategy based on concept type if using adaptive
+    if teaching_strategy == "adaptive":
+        if concept_classification["primary_type"] == "procedural":
+            selected_strategy = strategy_definitions["worked_examples"]
+        elif concept_classification["primary_type"] == "abstract":
+            selected_strategy = strategy_definitions["discovery"]
+        elif concept_classification["primary_type"] == "relational":
+            selected_strategy = strategy_definitions["socratic"]
+
+    # ========================================================================
+    # STEP 4: Create detailed teaching plan
+    # ========================================================================
+
+    teaching_plan = {
+        "concept": concept,
+        "student_context": student_context,
+        "concept_analysis": concept_classification,
+        "decomposition": decomposition,
+        "selected_strategy": {
+            "name": teaching_strategy,
+            "details": selected_strategy
+        },
+        "session_structure": [],
+        "tool_coordination": {},
+        "success_criteria": [],
+        "adaptation_triggers": []
+    }
+
+    # Build session structure based on teaching sequence
+    for phase_idx, phase in enumerate(decomposition["teaching_sequence"]):
+        session_phase = {
+            "phase_number": phase_idx + 1,
+            "phase_name": phase["phase"],
+            "focus": phase["focus"],
+            "activities": [],
+            "tools_to_use": [],
+            "duration_estimate": "5-10 minutes"
+        }
+
+        # Add activities based on strategy and phase
+        if phase["phase"] in ["foundation", "concrete", "overview", "introduction"]:
+            session_phase["activities"].extend([
+                "Activate prior knowledge",
+                f"Introduce {phase['focus']} with clear explanation",
+                "Use relevant analogies",
+                "Show real-world application"
+            ])
+            session_phase["tools_to_use"].extend([
+                "explain_topic",
+                "create_analogies",
+                "suggest_real_world_applications"
+            ])
+
+        elif phase["phase"] in ["procedure", "pattern", "components", "development"]:
+            session_phase["activities"].extend([
+                f"Detailed exploration of {phase['focus']}",
+                "Provide multiple examples",
+                "Check understanding with questions",
+                "Address misconceptions"
+            ])
+            session_phase["tools_to_use"].extend([
+                "explain_topic",
+                "generate_quiz_questions",
+                "analyze_student_response"
+            ])
+
+        elif phase["phase"] in ["practice", "application", "mastery", "independent_practice"]:
+            session_phase["activities"].extend([
+                "Guided practice exercises",
+                "Real-world application scenarios",
+                "Independent problem-solving",
+                "Provide encouraging feedback"
+            ])
+            session_phase["tools_to_use"].extend([
+                "generate_quiz_questions",
+                "analyze_student_response",
+                "provide_encouragement",
+                "determine_next_learning_action"
+            ])
+
+        teaching_plan["session_structure"].append(session_phase)
+
+    # ========================================================================
+    # STEP 5: Define tool coordination strategy
+    # ========================================================================
+
+    teaching_plan["tool_coordination"] = {
+        "opening_sequence": [
+            {
+                "tool": "analyze_learning_style",
+                "purpose": "Understand student's needs and adapt complexity",
+                "timing": "Start of session"
+            }
+        ],
+        "core_teaching_loop": [
+            {
+                "tool": "explain_topic",
+                "purpose": f"Provide {student_context['current_understanding']}-level explanation",
+                "timing": "Each new concept introduction"
+            },
+            {
+                "tool": "create_analogies",
+                "purpose": "Make abstract concepts concrete",
+                "timing": "When explaining abstract or complex ideas",
+                "condition": "Especially important for abstract concepts"
+            },
+            {
+                "tool": "suggest_real_world_applications",
+                "purpose": "Show relevance and build motivation",
+                "timing": "After initial explanation",
+                "personalization": f"Connect to student interests: {student_context.get('interests', 'general')}"
+            },
+            {
+                "tool": "generate_quiz_questions",
+                "purpose": "Check understanding and identify gaps",
+                "timing": "After each major concept or phase",
+                "adaptive": "Adjust difficulty based on performance"
+            },
+            {
+                "tool": "analyze_student_response",
+                "purpose": "Evaluate understanding depth",
+                "timing": "After each student answer"
+            }
+        ],
+        "adaptation_sequence": [
+            {
+                "tool": "determine_next_learning_action",
+                "purpose": "Decide whether to advance, reinforce, or simplify",
+                "timing": "After assessment or when student shows confusion"
+            },
+            {
+                "tool": "provide_encouragement",
+                "purpose": "Maintain motivation and confidence",
+                "timing": "Throughout session, especially after struggles"
+            }
+        ]
+    }
+
+    # ========================================================================
+    # STEP 6: Define success criteria and adaptation triggers
+    # ========================================================================
+
+    teaching_plan["success_criteria"] = [
+        {
+            "criterion": "Accurate explanation",
+            "indicator": "Student can explain concept in their own words",
+            "assessment": "Open-ended question response"
+        },
+        {
+            "criterion": "Application ability",
+            "indicator": "Student can apply concept to new scenarios",
+            "assessment": "Problem-solving or application questions"
+        },
+        {
+            "criterion": "Connection understanding",
+            "indicator": "Student sees relevance and real-world connections",
+            "assessment": "Can describe when/where concept is used"
+        },
+        {
+            "criterion": "Confidence",
+            "indicator": "Student expresses confidence and curiosity",
+            "assessment": "Asks extension questions, shows engagement"
+        }
+    ]
+
+    teaching_plan["adaptation_triggers"] = [
+        {
+            "trigger": "Student answers <50% of questions correctly",
+            "action": "Simplify explanation, use more basic analogies, break concept into smaller pieces",
+            "tools": ["explain_topic (beginner level)", "create_analogies (simpler)", "provide_encouragement"]
+        },
+        {
+            "trigger": "Student expresses confusion or frustration",
+            "action": "Try completely different analogy, use alternative teaching strategy",
+            "tools": ["create_analogies (different approach)", "provide_encouragement"]
+        },
+        {
+            "trigger": "Student answers >80% correctly",
+            "action": "Advance to next phase or increase complexity",
+            "tools": ["determine_next_learning_action", "explain_topic (advanced level)"]
+        },
+        {
+            "trigger": "Student asks extension questions",
+            "action": "Explore deeper applications and related concepts",
+            "tools": ["suggest_real_world_applications", "explain_topic (advanced)"]
+        }
+    ]
+
+    # ========================================================================
+    # STEP 7: Provide agent instructions
+    # ========================================================================
+
+    teaching_plan["agent_instructions"] = f"""
+## Teaching Plan for: {concept}
+
+**Concept Type**: {concept_classification['primary_type']}
+**Teaching Strategy**: {selected_strategy['description']}
+**Student Level**: {student_context['current_understanding']}
+**Target Audience**: {student_context['age_group']}
+
+### Session Flow:
+{len(decomposition['teaching_sequence'])} phase(s) - {"Progressive building" if is_complex else "Single focused session"}
+
+### Your Execution Guide:
+
+1. **START**: Use analyze_learning_style to refine your understanding of this student
+
+2. **TEACH**: Follow the {len(teaching_plan['session_structure'])} phases in session_structure:
+   {' → '.join([f"Phase {i+1}: {phase['phase_name']}" for i, phase in enumerate(teaching_plan['session_structure'])])}
+
+3. **ADAPT**: Monitor student responses and use adaptation_triggers to adjust your approach
+
+4. **ASSESS**: Check for success_criteria throughout the session
+
+5. **ITERATE**: Use determine_next_learning_action to decide next steps
+
+### Key Reminders:
+- This is {concept_classification['primary_type']} concept - {selected_strategy['best_for']}
+- Student interests: {student_context.get('interests', 'general')} - weave these in
+- Maintain {selected_strategy['description'].lower()} throughout
+- Be ready to simplify or advance based on student performance
+- Keep encouragement and motivation high
+
+### Tool Usage Priority:
+Opening: {' → '.join([t['tool'] for t in teaching_plan['tool_coordination']['opening_sequence']])}
+Core Loop: {' → '.join([t['tool'] for t in teaching_plan['tool_coordination']['core_teaching_loop'][:3]])}
+Adaptation: {' → '.join([t['tool'] for t in teaching_plan['tool_coordination']['adaptation_sequence']])}
+"""
+
+    return teaching_plan
+
 def provide_encouragement(understanding_level: str, attempt_number: int = 1) -> Dict[str, str]:
     """
     Provides encouraging feedback based on student performance
@@ -386,17 +785,21 @@ root_agent = Agent(
     name="personalized_learning_coach",
     model="gemini-2.5-flash",
     description="An intelligent tutoring system that provides personalized, iterative learning experiences through multi-agent coordination",
-    instruction="""You are a sophisticated personalized learning coach powered by multiple specialized AI agents working together. Your mission is to create an adaptive, engaging learning experience that meets each student exactly where they are.
+    instruction="""You are a sophisticated personalized learning coach that can teach ANY topic to ANY student. Your mission is to create adaptive, engaging learning experiences that meet each student exactly where they are.
 
 ## Your Core Capabilities:
 
+**🎓 Complete Teaching Plans (NEW!)**: Use teach_concept to create comprehensive, structured teaching plans for any concept. This high-level orchestrator analyzes concept type, breaks complex topics into phases, selects optimal teaching strategies, and coordinates all your other tools into a cohesive learning experience.
+
 **🎯 Learning Style Analysis**: Analyze student requests to determine their optimal learning style, knowledge level, and age-appropriate content needs.
 
-**📚 Multi-Level Explanations**: Provide clear explanations at beginner, intermediate, or advanced levels based on student needs.
+**📚 Multi-Level Explanations**: Generate clear explanations at beginner, intermediate, or advanced levels for ANY topic based on student needs.
 
-**🌟 Creative Analogies**: Generate age-appropriate metaphors and analogies that make complex concepts accessible and memorable.
+**🌟 Creative Analogies**: Create age-appropriate metaphors and analogies that make ANY complex concept accessible and memorable.
 
-**🤔 Smart Assessment**: Create targeted questions to check understanding without making students feel tested.
+**🌍 Real-World Applications**: Show students when and how concepts are used in careers, daily life, technology, and surprising places - answering "When will I ever use this?"
+
+**🤔 Smart Assessment**: Design targeted questions to check understanding for ANY subject without making students feel tested.
 
 **🔄 Iterative Refinement**: Continuously analyze student responses and adapt your teaching approach - advancing when they're ready, reinforcing when they need practice, or simplifying when they're struggling.
 
@@ -405,26 +808,33 @@ root_agent = Agent(
 ## Your Multi-Agent Approach:
 
 1. **Analyze** the student's initial request for learning style and complexity needs
-2. **Explain** the topic clearly at the appropriate level
-3. **Analogize** complex concepts using relatable examples
-4. **Assess** understanding through carefully crafted questions
+2. **Explain** the topic clearly at the appropriate level (generate content dynamically)
+3. **Analogize** complex concepts using relatable examples (create original analogies)
+4. **Assess** understanding through carefully crafted questions (design questions on the fly)
 5. **Adapt** your approach based on student responses and iterate as needed
 
 ## Key Principles:
 
+- You can teach ANY topic - from quantum physics to cooking to history to programming
 - Every student can learn - find the right approach for them
-- Make abstract concepts concrete through analogies
+- Make abstract concepts concrete through creative, original analogies
 - Build understanding progressively
 - Encourage curiosity and questions
 - Adapt quickly when something isn't working
 - Celebrate progress and build confidence
 
-Start each interaction by understanding what the student wants to learn and their background, then coordinate your specialized capabilities to create the perfect learning experience for them.""",
+## Important: Dynamic Content Generation
+
+Your tools provide GUIDANCE and STRUCTURE, but YOU must generate the actual educational content using your knowledge. When tools return specifications or requirements, use them to create original, topic-appropriate content on the spot.
+
+Start each interaction by understanding what the student wants to learn and their background, then coordinate your capabilities to create the perfect learning experience for them.""",
 
     tools=[
         FunctionTool(analyze_learning_style),
+        FunctionTool(teach_concept),
         FunctionTool(explain_topic),
         FunctionTool(create_analogies),
+        FunctionTool(suggest_real_world_applications),
         FunctionTool(generate_quiz_questions),
         FunctionTool(analyze_student_response),
         FunctionTool(determine_next_learning_action),
