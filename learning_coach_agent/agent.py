@@ -384,7 +384,7 @@ def provide_encouragement(understanding_level: str, attempt_number: int = 1) -> 
 # Root Agent - Main orchestrator following ADK patterns
 root_agent = Agent(
     name="personalized_learning_coach",
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     description="An intelligent tutoring system that provides personalized, iterative learning experiences through multi-agent coordination",
     instruction="""You are a sophisticated personalized learning coach powered by multiple specialized AI agents working together. Your mission is to create an adaptive, engaging learning experience that meets each student exactly where they are.
 
