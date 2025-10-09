@@ -2,6 +2,9 @@
 
 A sophisticated multi-agent learning system built with Google's Agent Development Kit (ADK) that demonstrates the power of iterative refinement and intelligent tutoring through AI agents.
 
+🚀 Want to see the power of AI tutoring in action? [Jump to usage examples](#usage) to explore how our agents collaborate
+to create personalized learning experiences!
+
 ## Overview
 
 This system creates a personalized learning experience where AI agents work together to:
@@ -65,10 +68,103 @@ The system consists of 5 specialized AI agents:
    export GOOGLE_CLOUD_PROJECT="your-project-id"
    ```
 
-3. **Run Google ADK**
+3. **Run Google ADK Locally**
    ```bash
    adk web
    ```
+
+## Deployment
+
+### Deploy to Google Cloud Run
+
+Deploy the Learning Coach Agent to Google Cloud Run using ADK's built-in deployment:
+
+```bash
+adk deploy cloud_run \
+  --project=YOUR_PROJECT_ID \
+  --region=YOUR_REGION \
+  --service_name=learning-coach \
+  --app_name=learning-coach \
+  --with_ui \
+  ./learning_coach_agent/
+```
+
+**Prerequisites:**
+1. **Google Cloud SDK** installed and authenticated:
+   ```bash
+   # Install gcloud CLI
+   # https://cloud.google.com/sdk/docs/install
+
+   # Authenticate
+   gcloud auth login
+   gcloud auth application-default login
+
+   # Set project
+   gcloud config set project YOUR_PROJECT_ID
+   ```
+
+2. **Enable Required APIs:**
+   ```bash
+   gcloud services enable run.googleapis.com
+   gcloud services enable aiplatform.googleapis.com
+   gcloud services enable cloudbuild.googleapis.com
+   gcloud services enable artifactregistry.googleapis.com
+   ```
+
+3. **Google Cloud project** with billing enabled
+
+4. **ADK installed:**
+   ```bash
+   pip install google-adk
+   ```
+
+**Command Options Explained:**
+- `--project`: Your Google Cloud project ID
+- `--region`: Deployment region (e.g., asia-south1, us-central1)
+- `--service_name`: Name for your Cloud Run service
+- `--app_name`: Application name for ADK API server
+- `--with_ui`: Enables the ADK developer UI (recommended for development/testing)
+- `./learning_coach_agent/`: Path to your agent directory containing agent.py
+
+**How It Works:**
+The `adk deploy cloud_run` command automatically:
+- Creates a Docker container from your agent code
+- Builds and pushes the image to Google Artifact Registry
+- Deploys the container to Cloud Run
+- Sets up the ADK API server with FastAPI
+- Configures auto-scaling and health checks
+
+**After Deployment:**
+- ADK will output a Cloud Run service URL (e.g., `https://learning-coach-xyz-uc.a.run.app`)
+- With `--with_ui`, you can access the developer UI at that URL
+- The service auto-scales based on traffic and scales to zero when idle
+- View your deployment:
+  ```bash
+  gcloud run services describe learning-coach --region=YOUR_REGION
+  ```
+
+**Production Considerations:**
+- Remove `--with_ui` flag for production deployments (it's for development/testing only)
+- Configure authentication:
+  ```bash
+  # Deploy without public access
+  adk deploy cloud_run \
+    --project=YOUR_PROJECT_ID \
+    --region=YOUR_REGION \
+    --service_name=learning-coach \
+    --app_name=learning-coach \
+    ./learning_coach_agent/
+
+  # Service requires authentication by default
+  ```
+
+**Troubleshooting:**
+- Ensure all required APIs are enabled
+- Verify you have necessary IAM permissions (Cloud Run Admin, Service Account User)
+- Check Cloud Build logs if deployment fails:
+  ```bash
+  gcloud builds list --limit=5
+  ```
 
 # Usage
 
